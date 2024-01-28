@@ -1,11 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
-using RestEase;
 using Xunit;
-
-#if !NET452
-using System.ComponentModel;
-#endif
 
 namespace RestEase.UnitTests
 {
@@ -24,23 +19,13 @@ namespace RestEase.UnitTests
 
             [Display(Name = "display")]
             Fizz,
-
-#if !NET452 && !NETCOREAPP3_0 && !NET5_0
-            [DisplayName("display_name")]
-#endif
             Buzz,
 
             [EnumMember(Value = "all_enum_member")]
             [Display(Name = "all_display")]
-#if !NET452 && !NETCOREAPP3_0 && !NET5_0
-            [DisplayName("all_display_name")]
-#endif
             All,
 
             [Display(Name = "display+name_display")]
-#if !NET452 && !NETCOREAPP3_0 && !NET5_0
-            [DisplayName("display+name_display_name")]
-#endif
             DisplayAndName
         }
 
