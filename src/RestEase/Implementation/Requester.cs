@@ -481,7 +481,7 @@ namespace RestEase.Implementation
         /// <param name="response">HttpResponseMessage which received from the endpoint</param>
         protected virtual async Task EnsureSuccessfulResponseIfNecessary(IRequestInfo requestInfo, HttpRequestMessage request, HttpResponseMessage response)
         {
-            if (!response.IsSuccessStatusCode && !requestInfo.AllowAnyStatusCode)
+            if (!response.IsSuccessStatusCode && !(requestInfo.AllowAnyStatusCode && response.StatusCode == HttpStatusCode.NotFound))
             {
                 var deserializer = new ApiExceptionContentDeserializer(this, response, requestInfo);
                 throw await ApiException.CreateAsync(request, response, deserializer).ConfigureAwait(false);
@@ -540,15 +540,22 @@ namespace RestEase.Implementation
         /// <typeparam name="T">Type of the response, to deserialize into</typeparam>
         /// <param name="requestInfo">IRequestInfo to construct the request from</param>
         /// <returns>Task resulting in the deserialized response</returns>
-        public virtual async Task<T> RequestAsync<T>(IRequestInfo requestInfo)
+        public virtual async Task<T?> RequestAsync<T>(IRequestInfo requestInfo)
         {
             using (var response = await this.SendRequestAsync(requestInfo, readBody: true).ConfigureAwait(false))
             {
-                string? content = response.Content == null ?
-                    null :
-                    await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                T deserializedResponse = this.Deserialize<T>(content, response, requestInfo);
-                return deserializedResponse;
+                if (response.IsSuccessStatusCode)
+                {
+                    string? content = response.Content == null ?
+                        null :
+                        await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    T deserializedResponse = this.Deserialize<T>(content, response, requestInfo);
+                    return deserializedResponse;
+                }
+                else
+                {
+                    return default(T);
+                }
             }
         }
 

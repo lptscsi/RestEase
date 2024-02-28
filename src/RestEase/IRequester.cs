@@ -23,7 +23,7 @@ namespace RestEase
         /// <typeparam name="T">Type of response object expected by the caller</typeparam>
         /// <param name="requestInfo">Object holding all information about the request</param>
         /// <returns>Task to return to the API interface caller</returns>
-        Task<T> RequestAsync<T>(IRequestInfo requestInfo);
+        Task<T?> RequestAsync<T>(IRequestInfo requestInfo);
 
         /// <summary>
         /// Invoked when the API interface method being called returns a Task{HttpResponseMessage}
